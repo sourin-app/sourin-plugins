@@ -1,0 +1,68 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  源影插件 · CI —— 只做一件事：**保证插件还能被构建出来**
+# ═══════════════════════════════════════════════════════════════════════
+#
+# 为什么值得单独开 CI：
+#   插件最终要被丢进 QuickJS 里跑，而 QuickJS **没有 import / export**。
+#   所以「TS 能编译」不等于「插件能用」—— 中间还有打包这一步，
+#   而打包有几条会**静默失效**的约束（头部注释被剥、产物里带模块语法）。
+#   build.mjs 里那三条断言就是防这个的，这里负责**每次提交都跑一遍**。
+
+name: 构建
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: 类型检查与构建
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 类型检查（0 error 才继续）
+        run: pnpm run typecheck
+
+      - name: 构建（含产物断言）
+        run: pnpm run build
+
+      - name: 复核产物（不依赖脚本自述）
+        run: |
+          set -e
+          fail=0
+          for f in dist/plugins/*.js; do
+            [ -e "$f" ] || continue
+            echo "== $f ($(wc -c < "$f") 字节)"
+            # ① 头部注释在（宿主靠它识别插件）
+            if ! grep -q '@id' "$f"; then
+              echo "::error file=$f::产物里没有 @id，宿主无法识别这个插件"
+              fail=1
+            fi
+            # ② 没有模块语法（QuickJS 不支持）
+            if grep -Eq '^[[:space:]]*(import|export)[[:space:]]' "$f"; then
+              echo "::error file=$f::产物里出现了 import/export，QuickJS 跑不了"
+              fail=1
+            fi
+            # ③ 不是空文件
+            if [ ! -s "$f" ]; then
+              echo "::error file=$f::产物是空的"
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] && echo "全部产物通过"
+          exit $fail

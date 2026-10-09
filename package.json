@@ -1,0 +1,17 @@
+{
+  "name": "sourin-plugins",
+  "version": "1.0.0",
+  "private": true,
+  "description": "源影（Sourin）插件的写法示例 —— TypeScript 类型定义 + 一份完整示例插件",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "node build.mjs",
+    "build:watch": "node build.mjs --watch",
+    "check": "pnpm run typecheck && pnpm run build"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0"
+  }
+}

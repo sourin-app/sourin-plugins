@@ -1,0 +1,19 @@
+# 依赖
+node_modules/
+
+# 构建产物（CI 会重建；本地跑 build 也会生成）
+dist/
+
+# 本地探针与隔离数据目录（实测用，不进库）
+.probe/
+.install.log
+.install.exit
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 类型检查中间产物
+*.tsbuildinfo
