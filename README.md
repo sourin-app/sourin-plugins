@@ -10,8 +10,13 @@
 
 ---
 
-> ⚠️ **本仓库是一份「怎么写插件」的示例，不是插件集合。**
-> 里面只有**一个**示例插件，用来演示完整写法；不收录、不分发其它源。
+> ⚠️ **本仓库的主体是一份「怎么写插件」的示例。**
+> `plugins/bilibili.ts` 演示完整写法（TS + 类型 + 构建）。
+>
+> ★ 2026-10-18 起另有 **31 个原生 JS 插件**放入 `plugins/`，
+> 它们是作者本地在用的插件，**只在这里留档备份**，不对外发布、不推荐他人使用。
+> 详见 [`docs/legacy-js-plugins.md`](docs/legacy-js-plugins.md)。
+>
 > 播放器本身**不自带任何内容源** —— 这是刻意的设计，见下。
 
 > **组织**：[sourin-app](https://github.com/sourin-app) —— 本仓库与播放器仓库
@@ -37,13 +42,20 @@ sourin-plugins/
 │   ├── host.d.ts            宿主注入的 host.http / store / config / log / util
 │   └── index.ts             definePlugin() / getText() / getJson()
 ├── plugins/
-│   └── bilibili.ts      ★ **唯一的示例**：一份完整、真跑过的插件
+│   ├── bilibili.ts      ★ **示例**：一份完整、真跑过的 TS 插件
+│   ├── *.js × 31        作者的本地插件（原生 JS，留档备份）
+│   └── _legacy/
+│       └── bilibili-20261012.js   旧版 bilibili（功能与 TS 版不同，见 docs）
 ├── docs/
 │   ├── API.md           完整接口契约（方法签名、返回结构、坑）
-│   └── TYPESCRIPT.md    用 TS 写插件：命令、构建、三条硬断言
+│   ├── TYPESCRIPT.md    用 TS 写插件：命令、构建、三条硬断言
+│   └── legacy-js-plugins.md  31 个 JS 插件的来源与同步方法
 ├── dist/                构建产物（.js）—— **这个才是丢给播放器的文件**
 └── README.md
 ```
+
+> ★ `build.mjs` **只编译 `plugins/*.ts`**，`plugins/` 下的 `.js` 不会被构建，
+> 两种来源可以并存，互不干扰。
 
 ## 从哪开始看
 
